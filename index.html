@@ -1,11 +1,322 @@
 <!DOCTYPE html>
 <html lang="ja">
   <head>
+    <!-- index.html内 -->
+    <link rel="stylesheet" href="style.css" />
+
     <meta charset="UTF-8" />
-    <title>きもちアプリ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>きもちカード</title>
+    <style>
+      :root {
+        font-size: 20px;
+      }
+      body {
+        margin: 0;
+        padding: 1.2rem;
+        font-family: "Hiragino Maru Gothic ProN", sans-serif;
+        background: #fff7ec;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+      h1 {
+        margin: 0 0 1rem;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+      }
+      /* 入力欄 */
+      textarea {
+        width: 100%;
+        max-width: 520px;
+        height: 110px;
+        border: 3px solid #aaa;
+        border-radius: 20px;
+        font-size: 1.1rem;
+        padding: 0.6rem;
+        resize: none;
+        margin-bottom: 1rem;
+        background: #ffffff;
+      }
+      /* かなキーボード */
+      .kana-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.6rem;
+        width: 100%;
+        max-width: 520px;
+        margin-bottom: 1.4rem;
+      }
+      .kana-btn {
+        font-size: 1.4rem;
+        font-weight: 600;
+        padding: 0.6rem 0;
+        cursor: pointer;
+        border: none;
+        background: #ffffff;
+        border: 2px solid #ccc;
+        border-radius: 12px;
+        transition: 0.12s;
+      }
+      .kana-btn:active {
+        background: #eee;
+      }
+
+      /* 感情ボタン */
+
+      .emoji-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 横4個並び */
+        gap: 0.3rem; /* 間隔せまめ */
+        max-width: 300px; /* 全体幅せまめ */
+        margin: 1rem auto;
+      }
+
+      .emoji-btn.selected {
+        border-color: #5bbe7d;
+        box-shadow: 0 0 8px #5bbe7d80;
+      }
+
+      /* フッターボタン */
+      .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        padding: 0.8rem 0;
+        background: #fff;
+        box-shadow: 0 -3px 6px #0002;
+      }
+      .footer button {
+        font-size: 1.1rem;
+        font-weight: 700;
+        border: none;
+        color: #fff;
+        background: #5bbe7d;
+        padding: 0.8rem 2.4rem;
+        border-radius: 14px;
+        cursor: pointer;
+      }
+      .footer button:active {
+        filter: brightness(0.85);
+      }
+      /* ログ表示 */
+      #logBox {
+        width: 100%;
+        max-width: 520px;
+        margin-bottom: 120px;
+        display: none;
+      }
+      #logBox h2 {
+        font-size: 1.2rem;
+        margin: 0.6rem 0 0.3rem;
+        font-weight: 700;
+      }
+      #logList {
+        padding-left: 1rem;
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.4;
+      }
+      /* 15文字を 5×3 で均等配置 */
+      .kana-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        font-size: 2rem;
+        text-align: center;
+      }
+      .kana-grid > * {
+        padding: 12px 0;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
-    <h1>ここは きもちアプリ のおへや！</h1>
-    <p>まだ、なにも ありません。</p>
+    <h1>きもちアプリ</h1>
+    <!-- テキスト入力（任意） -->
+    <textarea id="txt" placeholder="あいうえおタップで ことば が つくれるよ">
+    </textarea>
+
+    <!-- 感情ボタン -->
+    <section class="emoji-grid" id="grid">
+      <button class="emoji-btn">😀</button>
+      <button class="emoji-btn">😢</button>
+      <button class="emoji-btn">😠</button>
+      <button class="emoji-btn">❌</button>
+    </section>
+    <!-- ▼左右・送信ボタン -->
+    <div class="kana-nav">
+      <button id="prevPage">◀︎</button>
+      <button id="sendBtn">おくる</button>
+      <button id="nextPage">▶︎</button>
+    </div>
+    <!-- ▼かな5文字×3行を入れる器 -->
+    <section id="kana-grid" class="kana-grid"></section>
+
+    <script>
+      /* --- かなページ定義（5×3＝15文字を1ページ） --- */
+      const kanaPages = [
+        [
+          "あ",
+          "い",
+          "う",
+          "え",
+          "お",
+          "か",
+          "き",
+          "く",
+          "け",
+          "こ",
+          "さ",
+          "し",
+          "す",
+          "せ",
+          "そ",
+        ],
+        [
+          "た",
+          "ち",
+          "つ",
+          "て",
+          "と",
+          "な",
+          "に",
+          "ぬ",
+          "ね",
+          "の",
+          "は",
+          "ひ",
+          "ふ",
+          "へ",
+          "ほ",
+        ],
+        [
+          "ま",
+          "み",
+          "む",
+          "め",
+          "も",
+          "や",
+          "ゆ",
+          "よ",
+          "ら",
+          "り",
+          "る",
+          "れ",
+          "ろ",
+          "わ",
+          "ん",
+        ],
+      ];
+
+      let current = 0; // 今のページ番号 (0スタート)
+
+      /* ページの5×3ボタンを描画する関数 */
+      function renderKana() {
+        const grid = document.getElementById("kana-grid");
+        grid.innerHTML = ""; // 一旦クリア
+
+        kanaPages[current].forEach((k) => {
+          const btn = document.createElement("button");
+          btn.textContent = k;
+          btn.className = "kana-btn";
+          grid.appendChild(btn);
+        });
+
+        /* ◀︎▶︎ ボタンの有効／無効 */
+        prevPage.disabled = current === 0;
+        nextPage.disabled = current === kanaPages.length - 1;
+      }
+
+      /* ---------------- ナビボタンのイベント ---------------- */
+      prevPage.addEventListener("click", () => {
+        current--;
+        renderKana();
+      });
+      nextPage.addEventListener("click", () => {
+        current++;
+        renderKana();
+      });
+
+      /* --- 送信ボタン（バッファを GPT に送る例。今はダミー） --- */
+      let buffer = "";
+      document.getElementById("kana-grid").addEventListener("click", (e) => {
+        if (e.target.classList.contains("kana-btn"))
+          buffer += e.target.textContent;
+      });
+      sendBtn.addEventListener("click", () => {
+        if (!buffer) return;
+        console.log("送信内容:", buffer); // ★ここを fetch(API) にすればOK
+        buffer = "";
+      });
+
+      /* 初期化：最初のページを描画 */
+      renderKana();
+    </script>
+
+    <!-- ログ表示 -->
+    <section id="logBox">
+      <h2>📋 きょうのあしあと</h2>
+      <ul id="logList"></ul>
+    </section>
+
+    <!-- フッターボタン -->
+    <div class="footer">
+      <button id="parentBtn">親がみる</button>
+      <button id="endBtn">おわる</button>
+    </div>
+
+    <script>
+      const counts = {};
+      const logList = document.getElementById("logList");
+      const logBox = document.getElementById("logBox");
+      const txtArea = document.getElementById("txt");
+
+      // かなボタン → 文字を追加
+      document.querySelectorAll(".kana-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          txtArea.value += btn.textContent;
+        });
+      });
+
+      // 顔ボタン押下 → 選択状態&カウント
+      document.querySelectorAll(".emoji-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          btn.classList.toggle("selected");
+          const emo = btn.textContent;
+          counts[emo] = (counts[emo] || 0) + 1;
+        });
+      });
+
+      // 親がみる
+      document.getElementById("parentBtn").addEventListener("click", () => {
+        logList.innerHTML = "";
+        Object.entries(counts).forEach(([emo, c]) => {
+          const li = document.createElement("li");
+          li.textContent = `${emo} × ${c}`;
+          logList.appendChild(li);
+        });
+        const txt = txtArea.value.trim();
+        if (txt) {
+          const li = document.createElement("li");
+          li.textContent = `ことば: ${txt}`;
+          logList.appendChild(li);
+        }
+        logBox.style.display = "block";
+      });
+
+      // おわる（ページリロード）
+      document
+        .getElementById("endBtn")
+        .addEventListener("click", () => location.reload());
+    </script>
   </body>
 </html>
