@@ -60,3 +60,25 @@ sendBtn.addEventListener('click', () => {
 
   buffer = '';
 });
+// 送信ボタンが押されたとき
+document.getElementById("submit-button").addEventListener("click", async () => {
+  const input = document.getElementById("input-field").value;
+
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer sk-あなたのAPIキー"
+    },
+    body: JSON.stringify({
+      model: "gpt-4",  // または gpt-3.5-turbo
+      messages: [
+        { role: "system", content: "あなたは静かな子どもの感情を読み取る役割です。" },
+        { role: "user", content: input }
+      ]
+    })
+  });
+
+  const result = await response.json();
+  document.getElementById("output").innerText = result.choices[0].message.content;
+});
