@@ -144,7 +144,12 @@
     <!-- テキスト入力（任意） -->
     <textarea id="txt" placeholder="あいうえおタップで ことば が つくれるよ">
     </textarea>
-
+  <script>
+    document.getElementById("sendBtn").addEventListener("click", () => {
+      const userInput = document.getElementById("txt").value;
+      console.log("送信された内容:", userInput);
+    });
+  </script>
     <!-- 感情ボタン -->
     <section class="emoji-grid" id="grid">
       <button class="emoji-btn">😀</button>
