@@ -1,0 +1,62 @@
+// 初期表示
+document.addEventListener("DOMContentLoaded", () => {
+  showMessage("やあ、どうしたの？");
+  document.getElementById("cards").style.display = "none";
+});
+
+function showMessage(msg) {
+  const messageBox = document.getElementById("message");
+  messageBox.innerText = msg;
+}
+// 表示する場合
+document.querySelector(".kana-slide").classList.remove("hidden");
+
+// 非表示に戻す場合
+document.querySelector(".kana-slide").classList.add("hidden");
+.kana-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.3rem;
+  max-width: 300px;         /* 横幅を絞る */
+  margin: 1rem auto;
+}
+
+.kana-grid .kana-btn {
+  width: 60px;              /* 真四角に */
+  height: 60px;
+  font-size: 1.6rem;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+}
+
+.kana-nav {
+  margin-top: 0.8rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+}
+sendBtn.addEventListener('click', () => {
+  if (!buffer) return;
+
+  fetch("https://your-api-endpoint.com/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: buffer
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("GPTからの応答:", data);  // 必要に応じてUIに反映
+  })
+  .catch(err => {
+    console.error("送信エラー:", err);
+  });
+
+  buffer = '';
+});
