@@ -142,26 +142,8 @@
   <body>
     <h1>きもちアプリ</h1>
     <!-- テキスト入力（任意） -->
-<textarea id="txt" placeholder="あいうえおタップで ことば が つくれるよ"></textarea>
- <!-- JS：必ず </body> の直前に入れてください -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-  const sendBtn = document.getElementById('sendBtn');
-  const txt     = document.getElementById('txt');
-
-  // 要素が見つからなければすぐ分かる
-  if (!sendBtn || !txt) {
-    console.log('ボタンまたはテキストエリアが見つかりません');
-    return;
-  }
-
-  sendBtn.addEventListener('click', () => {
-    console.log('送信された内容:', txt.value);   // ← ここが必ず出る
-  });
-
-});
-</script>
+<textarea id="txt" placeholder="あいうえおタップで ことば が つくれるよ"></textarea >
+  
     <!-- 感情ボタン -->
     <section class="emoji-grid" id="grid">
       <button class="emoji-btn">😀</button>
