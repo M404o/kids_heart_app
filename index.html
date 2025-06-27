@@ -70,7 +70,7 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr); /* 横4個並び */
         gap: 0.3rem; /* 間隔せまめ */
-        max-width: 300px; /* 全体幅せまめ */
+        max-width: 400px; /* 全体幅せまめ */
         margin: 1rem auto;
       }
 
@@ -242,23 +242,7 @@
       });
       nextPage.addEventListener("click", () => {
         current++;
-        renderKana();
-      });
 
-      /* --- 送信ボタン（バッファを GPT に送る例。今はダミー） --- */
-      let buffer = "";
-      document.getElementById("kana-grid").addEventListener("click", (e) => {
-        if (e.target.classList.contains("kana-btn"))
-          buffer += e.target.textContent;
-      });
-      sendBtn.addEventListener("click", () => {
-        if (!buffer) return;
-        console.log("送信内容:", buffer); // ★ここを fetch(API) にすればOK
-        buffer = "";
-      });
-
-      /* 初期化：最初のページを描画 */
-      renderKana();
     </script>
 
     <!-- ログ表示 -->
@@ -316,6 +300,24 @@
       document
         .getElementById("endBtn")
         .addEventListener("click", () => location.reload());
-    </script>
+
+    
+document.addEventListener('DOMContentLoaded', () => {
+
+  const sendBtn = document.getElementById('sendBtn');
+  const txt     = document.getElementById('txt');
+
+  // 要素が見つからなければすぐ分かる
+  if (!sendBtn || !txt) {
+    console.log('ボタンまたはテキストエリアが見つかりません');
+    return;
+  }
+
+  sendBtn.addEventListener('click', () => {
+    console.log('送信された内容:', txt.value);   // ← ここが必ず出る
+  });
+
+});
+</script>   
   </body>
 </html>
