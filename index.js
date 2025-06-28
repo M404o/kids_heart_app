@@ -82,3 +82,16 @@ document.getElementById("submit-button").addEventListener("click", async () => {
   const result = await response.json();
   document.getElementById("output").innerText = result.choices[0].message.content;
 });
+sendBtn.addEventListener("click", () => {
+  const msg = document.getElementById("txt").value;
+  fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: msg })
+  })
+  .then(r => r.json())
+  .then(d => {
+    // 画面に出す場所（例 #output）があればそこに書く
+    document.getElementById("output").textContent = d.reply;
+  });
+});
