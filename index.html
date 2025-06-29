@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <!-- index.html内 -->
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="index.css" />
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -66,12 +66,15 @@
 
       /* 感情ボタン */
 
-      .emoji-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr); /* 横4個並び */
-        gap: 0.3rem; /* 間隔せまめ */
-        max-width: 400px; /* 全体幅せまめ */
-        margin: 1rem auto;
+      .emoji-btn {
+        font-size: 1.6rem;
+        padding: 0.8rem;
+        border: 2px solid #ccc;
+        border-radius: 0.5rem;
+        background-color: #fff;
+        cursor: pointer;
+        text-align: center;
+        line-height: 1;
       }
 
       .emoji-btn.selected {
@@ -137,13 +140,19 @@
         border-radius: 6px;
         cursor: pointer;
       }
+      .output-box {
+        padding: 4px;
+        min-height: 1em;
+      }
     </style>
   </head>
   <body>
     <h1>きもちアプリ</h1>
     <!-- テキスト入力（任意） -->
-<textarea id="txt" placeholder="あいうえおタップで ことば が つくれるよ"></textarea >
-  
+    <textarea id="txt" placeholder="あいうえおタップで ことば が つくれるよ">
+    </textarea>
+    <!-- スクリプト：ここに入れる -->
+    <div id="output" class="output-box"></div>
     <!-- 感情ボタン -->
     <section class="emoji-grid" id="grid">
       <button class="emoji-btn">😀</button>
@@ -151,17 +160,22 @@
       <button class="emoji-btn">😠</button>
       <button class="emoji-btn">❌</button>
     </section>
+    <script>
+      document.getElementById("sendBtn").addEventListener("click", () => {
+        const userInput = document.getElementById("txt").value;
+        console.log("送信された内容:", userInput);
+      });
+    </script>
     <!-- ▼左右・送信ボタン -->
     <div class="kana-nav">
       <button id="prevPage">◀︎</button>
       <button id="sendBtn">おくる</button>
       <button id="nextPage">▶︎</button>
     </div>
+
     <!-- ▼かな5文字×3行を入れる器 -->
     <section id="kana-grid" class="kana-grid"></section>
-
     <script>
-      /* --- かなページ定義（5×3＝15文字を1ページ） --- */
       const kanaPages = [
         [
           "あ",
@@ -216,33 +230,69 @@
         ],
       ];
 
-      let current = 0; // 今のページ番号 (0スタート)
+      let current = 0;
 
-      /* ページの5×3ボタンを描画する関数 */
+      // ボタン生成と反映
       function renderKana() {
         const grid = document.getElementById("kana-grid");
-        grid.innerHTML = ""; // 一旦クリア
+        grid.innerHTML = "";
 
         kanaPages[current].forEach((k) => {
           const btn = document.createElement("button");
           btn.textContent = k;
           btn.className = "kana-btn";
+          btn.addEventListener("click", () => {
+            const txtArea = document.getElementById("txt");
+            txtArea.value += k;
+          });
           grid.appendChild(btn);
         });
-
-        /* ◀︎▶︎ ボタンの有効／無効 */
-        prevPage.disabled = current === 0;
-        nextPage.disabled = current === kanaPages.length - 1;
       }
 
       /* ---------------- ナビボタンのイベント ---------------- */
-      prevPage.addEventListener("click", () => {
-        current--;
+      // ▶︎ ボタン
+      document.getElementById("nextPage").onclick = () => {
+        if (current < kanaPages.length - 1) current++;
         renderKana();
-      });
-      nextPage.addEventListener("click", () => {
-        current++;
+      };
 
+      // ◀︎ ボタン
+      document.getElementById("prevPage").onclick = () => {
+        if (current > 0) current--;
+        renderKana();
+      };
+
+      sendBtn.addEventListener("click", async () => {
+        const inputText = txt.value.trim();
+        if (!inputText) return;
+
+        try {
+          const res = await fetch(
+            "http://kids-heart-810rh2mct-ms-projects-a200c609.vercel.app/api/chat.js",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ message: inputText }),
+            }
+          );
+
+          const data = await res.json();
+          console.log("返ってきたレスポンス：", data);
+
+          // 最初の2行だけ抜き出して表示
+          const firstTwoLines = data.reply.split("\n").slice(0, 2).join("<br>");
+          document.getElementById("output").innerHTML = firstTwoLines;
+        } catch (err) {
+          console.error("GPTとの通信エラー", err);
+          document.getElementById("output").textContent =
+            "エラーが発生しました";
+        }
+      });
+
+      /* 初期化：最初のページを描画 */
+      renderKana();
     </script>
 
     <!-- ログ表示 -->
@@ -262,13 +312,6 @@
       const logList = document.getElementById("logList");
       const logBox = document.getElementById("logBox");
       const txtArea = document.getElementById("txt");
-
-      // かなボタン → 文字を追加
-      document.querySelectorAll(".kana-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          txtArea.value += btn.textContent;
-        });
-      });
 
       // 顔ボタン押下 → 選択状態&カウント
       document.querySelectorAll(".emoji-btn").forEach((btn) => {
@@ -295,29 +338,13 @@
         }
         logBox.style.display = "block";
       });
-
       // おわる（ページリロード）
-      document
-        .getElementById("endBtn")
-        .addEventListener("click", () => location.reload());
 
-    
-document.addEventListener('DOMContentLoaded', () => {
-
-  const sendBtn = document.getElementById('sendBtn');
-  const txt     = document.getElementById('txt');
-
-  // 要素が見つからなければすぐ分かる
-  if (!sendBtn || !txt) {
-    console.log('ボタンまたはテキストエリアが見つかりません');
-    return;
-  }
-
-  sendBtn.addEventListener('click', () => {
-    console.log('送信された内容:', txt.value);   // ← ここが必ず出る
-  });
-
-});
-</script>   
+      document.getElementById("sendBtn").addEventListener("click", () => {
+        const userInput = document.getElementById("txt").value;
+        console.log("送信された内容:", userInput);
+      });
+    </script>
   </body>
 </html>
+
