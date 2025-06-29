@@ -301,6 +301,19 @@
 if (message.trim() === "終わり") {
   return res.json({ reply: "きろくしたよ🙂" });
 }
+function shortenForKids(text) {
+  // 2行以内にし、やさしい語に言いかえる
+  const lines = text.split("\n").filter(l => l.trim() !== "");
+  const firstTwo = lines.slice(0, 2).join(" ");
+
+  // 手動でよく出る語を変換（例）
+  return firstTwo
+    .replace("リラックス", "やすんで")
+    .replace("休憩", "ちょっとやすんで")
+    .replace("お手伝い", "できることがあれば言ってね")
+    .replace("かもしれません", "かもね")
+    .replace("教えてください", "おしえてね🙂");
+}
 
       });
 
