@@ -289,6 +289,19 @@
           document.getElementById("output").textContent =
             "エラーが発生しました";
         }
+        body: JSON.stringify({
+  model: "gpt-4o-mini",
+  messages: [
+    { role: "system",
+      content: "子どもに話す口調で、優しく、2行以内で答えて。\n最後に必ず『🙂』を付ける。" },
+    { role: "user", content: message }
+  ],
+  temperature: 0.7
+})
+if (message.trim() === "終わり") {
+  return res.json({ reply: "きろくしたよ🙂" });
+}
+
       });
 
       /* 初期化：最初のページを描画 */
