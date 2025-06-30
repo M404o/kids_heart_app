@@ -155,10 +155,13 @@
     <div id="output" class="output-box"></div>
     <!-- 感情ボタン -->
     <section class="emoji-grid" id="grid">
-      <button class="emoji-btn">😀</button>
-      <button class="emoji-btn">😢</button>
-      <button class="emoji-btn">😠</button>
-      <button class="emoji-btn">❌</button>
+<div>
+  <button onClick={() => handleEmojiClick("🙂")}>🙂</button>
+  <button onClick={() => handleEmojiClick("😢")}>😢</button>
+  <button onClick={() => handleEmojiClick("😡")}>😡</button>
+  <button onClick={() => handleEmojiClick("❌")}>❌</button>
+</div>
+
     </section>
     <script>
       document.getElementById("sendBtn").addEventListener("click", () => {
@@ -273,7 +276,10 @@ sendBtn.addEventListener("click", async () => {
       },
       body: JSON.stringify({ message: inputText }),
     });
-
+// 絵文字がクリックされた時に `message` に内容を追加
+const handleEmojiClick = (emoji) => {
+  setMessage(prev => prev + " " + emoji);
+};
     const data = await res.json();
     console.log("返ってきたレスポンス：", data);
 
