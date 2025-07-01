@@ -267,7 +267,7 @@
       };
 sendBtn.addEventListener("click", async () => {
   const inputText = txt.value.trim();
-  if (inputText) return;
+  if (!inputText) return;
 
   try {
     const res = await fetch("/api/chat", {
@@ -275,7 +275,7 @@ sendBtn.addEventListener("click", async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify( message: inputText ),
+      body: JSON.stringify( message: {inputText} ),
     });
 function handleEmojiClick(emoji) {
   const txt = document.getElementById("txt");
