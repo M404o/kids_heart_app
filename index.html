@@ -275,10 +275,10 @@ sendBtn.addEventListener("click", async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: Text }),
+      body: JSON.stringify({ message: Txt }),
     });
 function handleEmojiClick(emoji) {
-  const txt = document.getElementById("text");
+  const txt = document.getElementById("txt");
   txt.value += emoji;
 }
     const data = await res.json();
