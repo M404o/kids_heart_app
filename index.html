@@ -267,7 +267,7 @@
       };
 sendBtn.addEventListener("click", async () => {
   const inputText = txt.value.trim();
-  if (!inputText) return;
+  if (inputText) return;
 
   try {
     const res = await fetch("/api/chat", {
