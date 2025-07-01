@@ -265,18 +265,22 @@
         if (current > 0) current--;
         renderKana();
       };
-sendBtn.addEventListener("click", async () => {
-  const inputText = txt.value.trim();
-  if (!inputText) return;
+            sendBtn.addEventListener("click", async () => {
+        const inputText = txt.value.trim();
+        if (!inputText) return;
 
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify( message: {inputText} ),
-    });
+        try {
+          const res = await fetch(
+            "https://kids-heart-app.vercel.app/api/chat",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ message: inputText }),
+            }
+          );
+
 function handleEmojiClick(emoji) {
   const txt = document.getElementById("txt");
   txt.value += emoji;
