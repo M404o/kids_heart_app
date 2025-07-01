@@ -246,7 +246,7 @@
           btn.textContent = k;
           btn.className = "kana-btn";
           btn.addEventListener("click", () => {
-            const txtArea = document.getElementById("txt");
+            const txt = document.getElementById("txt");
             txtArea.value += k;
           });
           grid.appendChild(btn);
@@ -275,10 +275,10 @@ sendBtn.addEventListener("click", async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: inputText }),
+      body: JSON.stringify({ message: Text }),
     });
 function handleEmojiClick(emoji) {
-  const txt = document.getElementById("inputText");
+  const txt = document.getElementById("ext");
   txt.value += emoji;
 }
     const data = await res.json();
