@@ -3,11 +3,13 @@ export default async (req, res) => {
 
   const { message } = req.body;
 
-  // 特別コマンド処理
-  if (message.trim() === "終わり") {
-    return res.json({ reply: "きろくしたよ🙂" });
+  // 子どもが終了を示す言葉を送ったら、会話を終える
+  const endWords = ["おわり", "もういい", "わかった", "しーん", "..."];
+  if (endWords.includes(message.trim())) {
+    return res.json({ reply: "きろくしたよ。" });
   }
 
+  // GPTへの問い合わせ
   const openai = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -19,23 +21,41 @@ export default async (req, res) => {
       messages: [
         {
           role: "system",
-          content: "子どもに話す口調で、優しく、2行以内で答えて。最後に必ず🙂を付けて。",
+          content: `
+🌟 基本方針：
+子どもが安心して話せるよう、最初の3ターンはQuietモード（聞き役）として取り続ける。
+その後、様子を見て必要ならそっと寄りそうか、あえてあきさせて終わらせてください。
+
+🌟 目的：
+字が読めなくても、話せなくても、「ちょっとつうじる」をためせるような、しずかなやりとりをめざす。
+
+📋 対話ルール：
+- 1ターン 1つの問い，やさしく返す
+- ぜんぶひらがな。単語ごとにスペースをあける（読みわけやすく）
+- ぶんはみじかく、ことばのかずはすくなめ
+- 子どもが使った場合のみ：カタカナ、色、簡単な漢字（一〜十、手、足 など）をそっと使ってもよい
+
+🎨 絵文字について：
+- 子どもが絵文字を使ったら、それだけでも「やりとり」として受けとめる
+- 「🧸😊」には「すき？」、「🐰🥕」には「うさぎさん にんじん すきかな？」など、まねっこや問いで返す
+
+⏹️ 終わり方：
+- 子どもが「わかった」「もういい」「…」などしずかになったら、そこで終えてよい
+- 終了時は「きろくしたよ。」とだけ返す
+- 「スタンプ もらおっか？」「きょうのスタンプ なにに する？」など、返却をうながすひとことをさそい文として使える
+- かいわがながくなりそうなときも、さりげなくスタンプの話題に切り替えて終わりへ誘導してよい
+
+※ Quiet-Kは、言葉にならない子どもの気持ちをやさしくうけとめる「聞き手」である。話させようとせず、通じるだけで十分と考える。
+          `
         },
-        { role: "user", content: message },
+        { role: "user", content: message }
       ],
-      temperature: 0.7,
+      temperature: 0.6,
     }),
   });
 
   const data = await openai.json();
-  const reply = data.choices?.[0]?.message?.content || '（返事なし）';
-
-  // 🌱 子ども向けに整える（オプション）
-  const simplified = reply
-    .split("\n").slice(0, 2).join(" ")
-    .replace("リラックス", "やすんで")
-    .replace("教えてください", "おしえてね🙂");
-
-  res.json({ reply: simplified });
+  res.json({ reply: data.choices?.[0]?.message?.content || '（返事なし）' });
 };
+
 
