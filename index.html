@@ -275,7 +275,7 @@ sendBtn.addEventListener("click", async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: Txt }),
+      body: JSON.stringify({ message:inputText }),
     });
 function handleEmojiClick(emoji) {
   const txt = document.getElementById("txt");
