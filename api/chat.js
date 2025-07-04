@@ -53,6 +53,7 @@ export default async (req, res) => {
       temperature: 0.6,
     }),
   });
+console.log("💡ENV API KEY:", process.env.KIDSHEARTAPP_OPENAI_KEY);
 
   const data = await openai.json();
   res.json({ reply: data.choices?.[0]?.message?.content || '（返事なし）' });
